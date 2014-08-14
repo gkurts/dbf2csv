@@ -36,7 +36,7 @@ namespace dbf2csv
                     foreach (DataRow row in dt.Rows)
                     {
                         //strip out single newline and carriage returns that bork things up.
-                        IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString().Replace("\r", "").Replace("\n", ""));
+                        IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString().Replace("\r", "").Replace("\n", "").Trim());
                         sb.AppendLine(string.Join(delimiter, fields));
                     }
 
