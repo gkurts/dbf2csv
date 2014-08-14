@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.OleDb;
 using System.IO;
@@ -14,6 +15,7 @@ namespace dbf2csv
         static void Main(string[] args)
         {
             var files = Directory.GetFiles(".", "*.dbf");
+            string delimiter = ConfigurationManager.AppSettings["delimiter"];
             foreach (string file in files)
             {
                 Console.Write("Processing " + file + "...");
@@ -29,12 +31,13 @@ namespace dbf2csv
                     StringBuilder sb = new StringBuilder();
 
                     IEnumerable<string> columnNames = dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName);
-                    sb.AppendLine(string.Join(",", columnNames));
+                    sb.AppendLine(string.Join(delimiter, columnNames));
 
                     foreach (DataRow row in dt.Rows)
                     {
-                        IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
-                        sb.AppendLine(string.Join(",", fields));
+                        //strip out single newline and carriage returns that bork things up.
+                        IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString().Replace("\r", "").Replace("\n", ""));
+                        sb.AppendLine(string.Join(delimiter, fields));
                     }
 
                     File.WriteAllText(Path.ChangeExtension(file, "csv"), sb.ToString());
