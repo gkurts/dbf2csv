@@ -20,17 +20,15 @@ namespace dbf2csv
                 using (OleDbConnection connection = new OleDbConnection("Provider=VFPOLEDB.1;Data Source=" + file))
                 {
                     connection.Open();
-                    DataTable tables = connection.GetSchema(System.Data.OleDb.OleDbMetaDataCollectionNames.Tables);
-
+                    
                     OleDbCommand cmd = new OleDbCommand("select * from " + file, connection);
                     DataTable dt = new DataTable();
-                    OleDbDataAdapter DA = new OleDbDataAdapter(cmd);
-                    DA.Fill(dt);
+                    OleDbDataAdapter da = new OleDbDataAdapter(cmd);
+                    da.Fill(dt);
 
                     StringBuilder sb = new StringBuilder();
 
-                    IEnumerable<string> columnNames = dt.Columns.Cast<DataColumn>().
-                        Select(column => column.ColumnName);
+                    IEnumerable<string> columnNames = dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName);
                     sb.AppendLine(string.Join(",", columnNames));
 
                     foreach (DataRow row in dt.Rows)
